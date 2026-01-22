@@ -2,21 +2,26 @@
 //**************************************
 // lang.l
 //
-// Scanner definition file
+// scanner definition file. flex uses this file to create the scanner
 //
-// Author: Phil Howard 
-// phil.howard@oit.edu
+// Author: Kaharra Wilcoxon
 //
-
-// Illustration showing how to use {} to control scope
-// NOTE: this is pseudo-code illustrating how you can adapt your current lang.l
 
 #include "cSymbol.h"
 #include "cSymbolTable.h"
 #include "lex.h"
 #include "tokens.h"
 
+//#define DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
+    #define DO_RETURN(a) { return Return(a); }
+#else
+    #define DO_RETURN(a) { return (a); }
+#endif
+
+int Return(int val);
 static int ProcessID();
+
 %}
 
 %option noyywrap
@@ -24,46 +29,87 @@ static int ProcessID();
 %option nounput
 %option yylineno
 
-    /* definitions go here. whitespace is an example. */
-whitespace      '[\t\n\r ]'
-
-%%
-{whitespace}+               {} /* Ignore whitespace */
-;                           {} /* Ignore semicolons */
-    /* control scope with curly braces
-     NOTE: This functionality will eventually move to the parser
-    */
-"{"                         return OPEN;
-"}"                         return CLOSE;
-LOCAL                       return LOCAL;
-GLOBAL                      return GLOBAL;
-LOOKUP                      return LOOKUP;
-INSERT                      return INSERT;
-[a-z]+                      {
-                                return ProcessID();
-                            }
+DIGIT           [0-9]
+LETTER          [a-zA-Z]
+IDENT           ({LETTER}|_)({LETTER}|{DIGIT}|_)*
+INT_CONST       {DIGIT}+
+FLOAT_CONST     {DIGIT}+\.{DIGIT}+
+STRING          \"[^"]*\"
+WHITESPACE      [ \t\n\r]+
+COMMENT         \/\/.*
 
 %%
 
-//******************************************************
-// ProcessID: create symbols in symbol table
+{WHITESPACE}                {}
+{COMMENT}                   {}
+
+"!="                        DO_RETURN(NOT_EQUALS);
+"=="                        DO_RETURN(EQUALS);
+"&&"                        DO_RETURN(AND);
+"||"                        DO_RETURN(OR);
+">="                        DO_RETURN(GE);
+"<="                        DO_RETURN(LE);
+
+"program"                   DO_RETURN(PROGRAM);
+"if"                        DO_RETURN(IF);
+"else"                      DO_RETURN(ELSE);
+"endif"                     DO_RETURN(ENDIF);
+"while"                     DO_RETURN(WHILE);
+"print"                     DO_RETURN(PRINT);
+"prints"                    DO_RETURN(PRINTS);
+"char"                      DO_RETURN(CHAR);
+"int"                       DO_RETURN(INT);
+"long"                      DO_RETURN(LONG);
+"float"                     DO_RETURN(FLOAT);
+"double"                    DO_RETURN(DOUBLE);
+"struct"                    DO_RETURN(STRUCT);
+"array"                     DO_RETURN(ARRAY);
+"return"                    DO_RETURN(RETURN);
+
+{FLOAT_CONST}               DO_RETURN(FLOAT_VAL);
+{INT_CONST}                 DO_RETURN(INT_VAL);
+{STRING}                    DO_RETURN(STRING_LIT);
+
+{IDENT}                     DO_RETURN(ProcessID());
+
+"("                         DO_RETURN('(');
+")"                         DO_RETURN(')');
+"{"                         { g_symbolTable.IncreaseScope(); DO_RETURN('{'); }
+"}"                         { g_symbolTable.DecreaseScope(); DO_RETURN('}'); }
+"["                         DO_RETURN('[');
+"]"                         DO_RETURN(']');
+";"                         DO_RETURN(';');
+","                         DO_RETURN(',');
+"."                         DO_RETURN('.');
+"+"                         DO_RETURN('+');
+"-"                         DO_RETURN('-');
+"*"                         DO_RETURN('*');
+"/"                         DO_RETURN('/');
+"%"                         DO_RETURN('%');
+"="                         DO_RETURN('=');
+">"                         DO_RETURN('>');
+"<"                         DO_RETURN('<');
+
+.                           DO_RETURN(JUNK_TOKEN);
+
+%%
+
+int Return(int val)
+{
+    printf("Scanned '%s': %d\n", yytext, val);
+    return val;
+}
+
 static int ProcessID()
 {
     string name(yytext);
     cSymbol *sym;
 
-    if (g_insert)
-    {
-        sym = g_symbolTable.FindLocal(name);
-        if (sym == nullptr)
-        {
-            sym = new cSymbol(name);
-            g_symbolTable.Insert(sym);
-        }
-    }
-    else
+    sym = g_symbolTable.FindLocal(name);
+    if (sym == nullptr)
     {
         sym = new cSymbol(name);
+        g_symbolTable.Insert(sym);
     }
     yylval.symbol = sym;
 

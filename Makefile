@@ -12,6 +12,7 @@
 COPTS=-Wall -g -c -O0 -std=c++11
 OBJS=main.o \
 	 langlex.o \
+	 cSymbolTable.o \
 
 all: lang
 
@@ -37,6 +38,9 @@ langlex.c: lang.l
 
 langlex.o: langlex.c
 	g++ $(COPTS) -Wno-sign-compare $? -o $@
+
+cSymbolTable.o: cSymbolTable.cpp cSymbolTable.h cSymbol.h
+	g++ $(COPTS) cSymbolTable.cpp -o $@
 
 lang: $(OBJS)
 	g++ $(OBJS) -o lang
