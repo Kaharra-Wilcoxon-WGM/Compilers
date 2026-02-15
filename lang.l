@@ -10,7 +10,7 @@
 #include "cSymbol.h"
 #include "cSymbolTable.h"
 #include "lex.h"
-#include "tokens.h"
+#include "langparse.h"
 
 //#define DEBUG_OUTPUT
 #ifdef DEBUG_OUTPUT
@@ -57,25 +57,25 @@ COMMENT         \/\/.*
 "while"                     DO_RETURN(WHILE);
 "print"                     DO_RETURN(PRINT);
 "prints"                    DO_RETURN(PRINTS);
-"char"                      DO_RETURN(CHAR);
-"int"                       DO_RETURN(INT);
-"long"                      DO_RETURN(LONG);
-"float"                     DO_RETURN(FLOAT);
-"double"                    DO_RETURN(DOUBLE);
+"char"                      DO_RETURN(ProcessID());
+"int"                       DO_RETURN(ProcessID());
+"long"                      DO_RETURN(ProcessID());
+"float"                     DO_RETURN(ProcessID());
+"double"                    DO_RETURN(ProcessID());
 "struct"                    DO_RETURN(STRUCT);
 "array"                     DO_RETURN(ARRAY);
 "return"                    DO_RETURN(RETURN);
 
-{FLOAT_CONST}               DO_RETURN(FLOAT_VAL);
-{INT_CONST}                 DO_RETURN(INT_VAL);
-{STRING}                    DO_RETURN(STRING_LIT);
+{FLOAT_CONST}               {yylval.float_val = atof(yytext); DO_RETURN(FLOAT_VAL);}
+{INT_CONST}                 {yylval.int_val = atoi(yytext); DO_RETURN(INT_VAL);}
+{STRING}                    {yylval.str_val = new std::string(yytext); DO_RETURN(STRING_LIT);}
 
 {IDENT}                     DO_RETURN(ProcessID());
 
 "("                         DO_RETURN('(');
 ")"                         DO_RETURN(')');
-"{"                         { g_symbolTable.IncreaseScope(); DO_RETURN('{'); }
-"}"                         { g_symbolTable.DecreaseScope(); DO_RETURN('}'); }
+"{"                         DO_RETURN('{');
+"}"                         DO_RETURN('}');
 "["                         DO_RETURN('[');
 "]"                         DO_RETURN(']');
 ";"                         DO_RETURN(';');
@@ -105,12 +105,20 @@ static int ProcessID()
     string name(yytext);
     cSymbol *sym;
 
-    sym = g_symbolTable.FindLocal(name);
-    if (sym == nullptr)
+    // First check if the symbol exists in any scope
+    sym = g_symbolTable.Find(name);
+    if (sym != nullptr)
     {
-        sym = new cSymbol(name);
-        g_symbolTable.Insert(sym);
+        yylval.symbol = sym;
+        // Check if it's a type - return TYPE_ID if so
+        if (sym->IsType())
+            return TYPE_ID;
+        return IDENTIFIER;
     }
+
+    // Symbol doesn't exist - create new one in local scope
+    sym = new cSymbol(name);
+    g_symbolTable.Insert(sym);
     yylval.symbol = sym;
 
     return IDENTIFIER;

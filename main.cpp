@@ -1,94 +1,93 @@
 //**************************************
 // main.cpp
 //
-// main routine for lang compiler.
-// This version only runs the lexer
+// Main function for lang compiler
 //
-// Author: Phil Howard
-// phil.howard@oit.edu
-//
-// Date: Nov. 23, 2015
+// Author: Phil Howard 
 //
 
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <iostream>
 #include <fstream>
-
-#include "cSymbol.h"
 #include "cSymbolTable.h"
 #include "lex.h"
-#include "tokens.h"
+#include "astnodes.h"
+#include "langparse.h"
 
-// Uncomment the following line after integrating your symbol table with
-// your scanner.
-#define TEST2
-
+// define global variables
 cSymbolTable g_symbolTable;
-long long cSymbol::nextId = 0;
-yylval_t yylval;
+long long cSymbol::nextId;
 
-//****************************************
-// argv[1] contains the file to process
-// argv[2] if given, contains the name of the output file
+// Helper function to insert a type symbol into the symbol table
+static void InsertType(const char* name)
+{
+    cSymbol* sym = new cSymbol(name);
+    sym->SetIsType(true);
+    g_symbolTable.Insert(sym);
+}
+
+// takes two string args: input_file, and output_file
 int main(int argc, char **argv)
 {
+    std::cout << "Philip Howard" << std::endl;
+
+    // Insert standard types into the symbol table (in the order specified)
+    InsertType("char");
+    InsertType("int");
+    InsertType("float");
+    InsertType("long");
+    InsertType("double");
+
     const char *outfile_name;
     int result = 0;
-    int token;
-    int do_test2 = 0;
-
-    std::cout << "Kaharra Wilcoxon" << std::endl;
 
     if (argc > 1)
     {
         yyin = fopen(argv[1], "r");
-        if (yyin == NULL)
+        if (yyin == nullptr)
         {
-            std::cerr << "Unable to open file " << argv[1] << "\n";
+            std::cerr << "ERROR: Unable to open file " << argv[1] << "\n";
             exit(-1);
         }
     }
 
+    // Setup the output. If empty, use stdout (which may be redirected)
     if (argc > 2)
     {
         outfile_name = argv[2];
+
         FILE *output = fopen(outfile_name, "w");
-        if (output == NULL)
+        if (output == nullptr)
         {
             std::cerr << "Unable to open output file " << outfile_name << "\n";
             exit(-1);
         }
+
+        // redirect stdout to the output file
         int output_fd = fileno(output);
         if (dup2(output_fd, 1) != 1)
         {
-            std::cerr << "Unable to send output to " << outfile_name << "\n";
-            exit(-2);
+            std::cerr << "Unable configure output stream\n";
+            exit(-1);
         }
     }
 
-    if (argc > 3) do_test2 = 1;
-
-    token = yylex();
-    while (token != 0)
+    result = yyparse();
+    if (yyast_root != nullptr)
     {
-#ifdef TEST2
-        if (do_test2 && token == IDENTIFIER)
-            printf("%d:%s:%lld\n", token, yytext, yylval.symbol->GetId());
-        else
-            printf("%d:%s\n", token, yytext);
-#else
-        if (do_test2)
+        if (result == 0)
         {
-            fprintf(stderr, "Not compiled with TEST2 defined\n");
-            return 0;
+            std::cout << yyast_root->ToString();
+        } else {
+            std::cout << " Errors in compile\n";
         }
-        else
-            printf("%d:%s\n", token, yytext);
-#endif
+    }
 
-        token = yylex();
+    if (result == 0 && yylex() != 0)
+    {
+        std::cout << "Junk at end of program\n";
     }
 
     return result;
