@@ -220,22 +220,53 @@ class cComputeSize : public cVisitor
 
                 if (fieldSym != nullptr)
                 {
-                    // Struct field access
-                    cDeclNode *fieldDecl = fieldSym->GetDecl();
-                    if (fieldDecl != nullptr)
+                    // Struct field access — resolve by name in the struct's field list
+                    cVarDeclNode *currentVar = dynamic_cast<cVarDeclNode*>(currentDecl);
+                    if (currentVar != nullptr)
                     {
-                        offset += fieldDecl->GetOffset();
-                        size = fieldDecl->GetSize();
-                        currentDecl = fieldDecl;
+                        cSymbol *typeSym = currentVar->GetType();
+                        cDeclNode *typeDecl = typeSym->GetDecl();
+                        cStructDeclNode *structDecl = dynamic_cast<cStructDeclNode*>(typeDecl);
+                        if (structDecl != nullptr)
+                        {
+                            cDeclsNode *fields = structDecl->GetDecls();
+                            for (int j = 0; j < fields->NumDecls(); j++)
+                            {
+                                cVarDeclNode *field = dynamic_cast<cVarDeclNode*>(fields->GetDecl(j));
+                                if (field != nullptr && field->GetName()->GetName() == fieldSym->GetName())
+                                {
+                                    offset += field->GetOffset();
+                                    size = field->GetSize();
+                                    currentDecl = field;
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    // Array index — this is an expression (index)
-                    // Add rowsize for this indexing level
-                    // We need to figure out the element size at this level
+                    // Array index — compute rowsize and walk down the type chain
                     int rowSize = GetArrayElementSize(currentDecl);
                     node->AddRowSize(rowSize);
+
+                    // Update currentDecl to represent one level deeper for multi-dim arrays
+                    cVarDeclNode *varDecl = dynamic_cast<cVarDeclNode*>(currentDecl);
+                    if (varDecl != nullptr)
+                    {
+                        cSymbol *typeSym = varDecl->GetType();
+                        cDeclNode *typeDecl = typeSym->GetDecl();
+                        cArrayDeclNode *arrayDecl = dynamic_cast<cArrayDeclNode*>(typeDecl);
+                        if (arrayDecl != nullptr)
+                        {
+                            cSymbol *elemTypeSym = arrayDecl->GetType();
+                            cDeclNode *elemTypeDecl = elemTypeSym->GetDecl();
+                            if (elemTypeDecl != nullptr)
+                            {
+                                currentDecl = elemTypeDecl;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -291,7 +322,7 @@ class cComputeSize : public cVisitor
         // Get the element size for array indexing (for rowsizes)
         int GetArrayElementSize(cDeclNode *decl)
         {
-            // The decl should be a var_decl whose type is an array
+            // The decl may be a var_decl whose type is an array
             cVarDeclNode *varDecl = dynamic_cast<cVarDeclNode*>(decl);
             if (varDecl != nullptr)
             {
@@ -300,9 +331,15 @@ class cComputeSize : public cVisitor
                 cArrayDeclNode *arrayDecl = dynamic_cast<cArrayDeclNode*>(typeDecl);
                 if (arrayDecl != nullptr)
                 {
-                    // Element size = base type size (possibly recursive for multi-dim)
                     return GetTypeSize(arrayDecl->GetType());
                 }
+            }
+
+            // After walking down the type chain, decl may be an array decl directly
+            cArrayDeclNode *arrayDecl = dynamic_cast<cArrayDeclNode*>(decl);
+            if (arrayDecl != nullptr)
+            {
+                return GetTypeSize(arrayDecl->GetType());
             }
             return 0;
         }
