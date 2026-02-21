@@ -23,6 +23,10 @@ class cBinaryExprNode : public cExprNode
             AddChild(right);
         }
 
+        cExprNode* GetLeft()   { return static_cast<cExprNode*>(GetChild(0)); }
+        cOpNode* GetOp()       { return static_cast<cOpNode*>(GetChild(1)); }
+        cExprNode* GetRight()  { return static_cast<cExprNode*>(GetChild(2)); }
+
         virtual string NodeType() { return string("expr"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

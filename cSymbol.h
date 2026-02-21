@@ -15,6 +15,8 @@ using std::string;
 
 #include "cAstNode.h"
 
+class cDeclNode;
+
 class cSymbol : public cAstNode
 {
     public:
@@ -24,6 +26,7 @@ class cSymbol : public cAstNode
             m_id = ++nextId;        // get next available ID
             m_name = name;
             m_isType = false;
+            m_decl = nullptr;
         }
 
         // return name of symbol
@@ -34,6 +37,10 @@ class cSymbol : public cAstNode
 
         // Set whether this symbol represents a type
         void SetIsType(bool isType) { m_isType = isType; }
+
+        // Get/Set the declaration node associated with this symbol
+        cDeclNode* GetDecl() { return m_decl; }
+        void SetDecl(cDeclNode* decl) { m_decl = decl; }
 
         virtual string AttributesToString()
         {
@@ -49,4 +56,5 @@ class cSymbol : public cAstNode
         long long m_id;                 // Unique ID for this symbol
         string m_name;                  // name of symbol
         bool m_isType;                  // true if this symbol is a type
+        cDeclNode *m_decl;              // declaration associated with this symbol
 };

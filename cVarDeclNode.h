@@ -48,6 +48,9 @@ class cVarDeclNode : public cDeclNode
             }
         }
 
+        cSymbol* GetType()  { return static_cast<cSymbol*>(GetChild(0)); }
+        cSymbol* GetName()  { return static_cast<cSymbol*>(GetChild(1)); }
+
         virtual string NodeType() { return string("var_decl"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

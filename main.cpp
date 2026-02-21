@@ -79,6 +79,9 @@ int main(int argc, char **argv)
     {
         if (result == 0)
         {
+            cComputeSize sizeVisitor;
+            sizeVisitor.VisitAllNodes(yyast_root);
+
             std::cout << yyast_root->ToString();
         } else {
             std::cout << " Errors in compile\n";

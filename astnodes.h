@@ -38,4 +38,5 @@
 #include "cFuncExprNode.h"
 #include "cArrayDeclNode.h"
 #include "cPrintsNode.h"
+#include "cComputeSize.h"
 

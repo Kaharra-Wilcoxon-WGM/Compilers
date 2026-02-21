@@ -15,9 +15,9 @@
 class cArrayDeclNode : public cDeclNode
 {
     public:
-        // params are base type, size, and name
-        cArrayDeclNode(cSymbol *type, int size, cSymbol *name)
-            : cDeclNode(), m_size(size)
+        // params are base type, count, and name
+        cArrayDeclNode(cSymbol *type, int count, cSymbol *name)
+            : cDeclNode(), m_count(count)
         {
             AddChild(type);
 
@@ -51,14 +51,18 @@ class cArrayDeclNode : public cDeclNode
             }
         }
 
+        cSymbol* GetType()  { return static_cast<cSymbol*>(GetChild(0)); }
+        cSymbol* GetName()  { return static_cast<cSymbol*>(GetChild(1)); }
+        int GetCount()      { return m_count; }
+
         virtual string AttributesToString()
         {
-            return " count=\"" + std::to_string(m_size) + "\"";
+            return " count=\"" + std::to_string(m_count) + "\"";
         }
 
         virtual string NodeType() { return string("array_decl"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
     private:
-        int m_size;
+        int m_count;
 };

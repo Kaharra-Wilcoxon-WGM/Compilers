@@ -31,6 +31,14 @@ class cFuncExprNode : public cExprNode
             AddChild(name);
         }
 
+        cSymbol* GetName() { return static_cast<cSymbol*>(GetChild(0)); }
+        cParamListNode* GetParams()
+        {
+            if (NumChildren() > 1)
+                return static_cast<cParamListNode*>(GetChild(1));
+            return nullptr;
+        }
+
         virtual string NodeType() { return string("funcCall"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

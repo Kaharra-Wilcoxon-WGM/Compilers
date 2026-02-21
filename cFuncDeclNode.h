@@ -50,6 +50,12 @@ class cFuncDeclNode : public cDeclNode
             AddChild(stmts);
         }
 
+        cSymbol* GetType()       { return static_cast<cSymbol*>(GetChild(0)); }
+        cSymbol* GetName()       { return static_cast<cSymbol*>(GetChild(1)); }
+        cParamsNode* GetParams() { return m_params; }
+        cDeclsNode* GetDecls()   { return m_decls; }
+        cStmtsNode* GetStmts()   { return m_stmts; }
+
         virtual string NodeType() { return string("func"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 

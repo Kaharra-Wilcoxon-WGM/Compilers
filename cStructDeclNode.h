@@ -52,6 +52,9 @@ class cStructDeclNode : public cDeclNode
             }
         }
 
+        cDeclsNode* GetDecls() { return static_cast<cDeclsNode*>(GetChild(0)); }
+        cSymbol* GetName()     { return static_cast<cSymbol*>(GetChild(1)); }
+
         virtual string NodeType() { return string("struct_decl"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
