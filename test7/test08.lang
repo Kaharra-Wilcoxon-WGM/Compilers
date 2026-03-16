@@ -1,0 +1,19 @@
+// Kaharra Wilcoxon
+// Test function calls with parameters
+program
+{
+    int add(int a, int b)
+    {
+        return a + b;
+    }
+
+    int mul(int a, int b)
+    {
+        return a * b;
+    }
+
+    print(add(3, 5));
+    print(mul(6, 7));
+    print(add(10, mul(3, 4)));
+    print(add(add(1, 2), add(3, 4)));
+}

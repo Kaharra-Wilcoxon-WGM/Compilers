@@ -35,6 +35,7 @@ void cVisitor::Visit(cStmtsNode *node)        { node->VisitAllChildren(this); }
 void cVisitor::Visit(cStructDeclNode *node)   { node->VisitAllChildren(this); }
 void cVisitor::Visit(cSymbol *node)           { node->VisitAllChildren(this); }
 void cVisitor::Visit(cVarDeclNode *node)      { node->VisitAllChildren(this); }
+void cVisitor::Visit(cBaseTypeNode *node)     { node->VisitAllChildren(this); }
 void cVisitor::Visit(cVarExprNode *node)      { node->VisitAllChildren(this); }
 void cVisitor::Visit(cWhileNode *node)        { node->VisitAllChildren(this); }
 

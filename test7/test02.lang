@@ -1,0 +1,14 @@
+// Kaharra Wilcoxon
+// Test char variables use char-width operations, not word-width
+program
+{
+    char c;
+    int x;
+    c = 65;
+    x = 100;
+    print(c);
+    print(x);
+    c = 66;
+    print(c);
+    print(x);
+}

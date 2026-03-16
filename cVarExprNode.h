@@ -11,6 +11,7 @@
 #include "cAstNode.h"
 #include "cExprNode.h"
 #include "cSymbol.h"
+#include "cVarDeclNode.h"
 
 class cVarExprNode : public cExprNode
 {
@@ -19,6 +20,13 @@ class cVarExprNode : public cExprNode
         cVarExprNode(cSymbol *sym) : cExprNode(), m_size(0), m_offset(0)
         {
             AddChild(sym);
+
+            // Check if the symbol is defined
+            if (sym->GetDecl() == nullptr)
+            {
+                SemanticParseError("Symbol " + sym->GetName() +
+                    " not defined");
+            }
         }
 
         // Add another symbol (for struct field access like a.b.c)
@@ -39,6 +47,8 @@ class cVarExprNode : public cExprNode
         void SetOffset(int offset) { m_offset = offset; }
 
         void AddRowSize(int rs) { m_rowsizes.push_back(rs); }
+        int GetRowSize(int i) { return m_rowsizes[i]; }
+        int NumRowSizes() { return (int)m_rowsizes.size(); }
 
         cAstNode* GetElement(int index) { return GetChild(index); }
         int NumElements() { return NumChildren(); }
@@ -60,6 +70,23 @@ class cVarExprNode : public cExprNode
                 result += "\"";
             }
             return result;
+        }
+
+        virtual cDeclNode* GetType()
+        {
+            cSymbol *sym = static_cast<cSymbol*>(GetChild(0));
+            if (sym == nullptr || sym->GetDecl() == nullptr) return nullptr;
+            cDeclNode *decl = sym->GetDecl();
+            if (decl->IsFunc()) return nullptr;
+            if (decl->IsVar())
+            {
+                cVarDeclNode *vd = static_cast<cVarDeclNode*>(decl);
+                cSymbol *typeSym = vd->GetType();
+                if (typeSym == nullptr || typeSym->GetDecl() == nullptr)
+                    return nullptr;
+                return typeSym->GetDecl();
+            }
+            return nullptr;
         }
 
         virtual string NodeType() { return string("varref"); }

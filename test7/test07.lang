@@ -1,0 +1,18 @@
+// Kaharra Wilcoxon
+// Test function calls without parameters
+program
+{
+    int seven()
+    {
+        return 7;
+    }
+
+    int forty_two()
+    {
+        return 42;
+    }
+
+    print(seven());
+    print(forty_two());
+    print(seven() + forty_two());
+}

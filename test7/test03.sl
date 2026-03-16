@@ -1,0 +1,45 @@
+.dataseg
+.codeseg
+PUSH  3 
+PUSH  4 
+PLUS
+CALL @print
+POP
+POP
+PUSH  10 
+PUSH  3 
+MINUS
+CALL @print
+POP
+POP
+PUSH  6 
+PUSH  7 
+TIMES
+CALL @print
+POP
+POP
+PUSH  20 
+PUSH  4 
+DIVIDE
+CALL @print
+POP
+POP
+PUSH  17 
+PUSH  5 
+MOD
+CALL @print
+POP
+POP
+PUSH  100 
+PUSH  200 
+PLUS
+CALL @print
+POP
+POP
+PUSH  50 
+PUSH  75 
+MINUS
+CALL @print
+POP
+POP
+HALT

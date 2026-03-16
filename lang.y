@@ -133,7 +133,7 @@ array_decl:   ARRAY TYPE_ID '[' INT_VAL ']' IDENTIFIER
                                 { $$ = new cArrayDeclNode($2, $4, $6); }
 
 func_decl:  func_header ';'
-                                { $$ = $1; g_symbolTable.DecreaseScope(); }
+                                { $$ = $1; static_cast<cFuncDeclNode*>($$)->CopyFromPrev(); g_symbolTable.DecreaseScope(); }
         |   func_header  '{' decls stmts '}'
                                 { $$ = $1; static_cast<cFuncDeclNode*>($$)->SetDecls($3); static_cast<cFuncDeclNode*>($$)->SetStmts($4); g_symbolTable.DecreaseScope(); }
         |   func_header  '{' stmts '}'
@@ -206,6 +206,20 @@ param:      expr
 
 expr:       expr EQUALS addit
                                 { $$ = new cBinaryExprNode($1, new cOpNode(EQUALS), $3); }
+        |   expr NOT_EQUALS addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode(NOT_EQUALS), $3); }
+        |   expr '>' addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode('>'), $3); }
+        |   expr '<' addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode('<'), $3); }
+        |   expr GE addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode(GE), $3); }
+        |   expr LE addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode(LE), $3); }
+        |   expr AND addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode(AND), $3); }
+        |   expr OR addit
+                                { $$ = new cBinaryExprNode($1, new cOpNode(OR), $3); }
         |   addit
                             { $$ = $1; }
 
@@ -227,6 +241,8 @@ term:       term '*' fact
 
 fact:       '(' expr ')'
                                 { $$ = $2; }
+        |   '-' fact
+                            { $$ = new cBinaryExprNode(new cIntExprNode(0), new cOpNode('-'), $2); }
         |   INT_VAL
                             { $$ = new cIntExprNode($1); }
         |   FLOAT_VAL

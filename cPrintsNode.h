@@ -34,6 +34,8 @@ class cPrintsNode : public cStmtNode
             return " value=\"" + m_value + "\"";
         }
 
+        string GetValue() { return m_value; }
+
         virtual string NodeType() { return string("prints"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 

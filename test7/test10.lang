@@ -1,0 +1,25 @@
+// Kaharra Wilcoxon
+// Test stack preservation across function calls
+// Variables should retain their values after calling functions
+program
+{
+    int negate(int x)
+    {
+        return 0 - x;
+    }
+
+    int a;
+    int b;
+    int c;
+    a = 10;
+    b = 20;
+    c = 30;
+    print(negate(a));
+    print(a);
+    print(b);
+    print(c);
+    a = negate(b);
+    print(a);
+    print(b);
+    print(c);
+}

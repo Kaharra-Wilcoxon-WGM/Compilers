@@ -1,0 +1,6 @@
+// Test the printing of ints
+program
+{
+    print(1);
+    print(2);
+}

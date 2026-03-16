@@ -11,6 +11,7 @@
 #include "cExprNode.h"
 #include "cSymbol.h"
 #include "cParamListNode.h"
+#include "cFuncDeclNode.h"
 
 class cFuncExprNode : public cExprNode
 {
@@ -22,6 +23,12 @@ class cFuncExprNode : public cExprNode
             AddChild(name);
             if (params != nullptr)
                 AddChild(params);
+
+            if (name->GetDecl() == nullptr)
+            {
+                SemanticParseError("Symbol " + name->GetName() +
+                    " not defined");
+            }
         }
 
         // Constructor without parameters
@@ -29,6 +36,12 @@ class cFuncExprNode : public cExprNode
             : cExprNode()
         {
             AddChild(name);
+
+            if (name->GetDecl() == nullptr)
+            {
+                SemanticParseError("Symbol " + name->GetName() +
+                    " not defined");
+            }
         }
 
         cSymbol* GetName() { return static_cast<cSymbol*>(GetChild(0)); }
@@ -36,6 +49,22 @@ class cFuncExprNode : public cExprNode
         {
             if (NumChildren() > 1)
                 return static_cast<cParamListNode*>(GetChild(1));
+            return nullptr;
+        }
+
+        virtual cDeclNode* GetType()
+        {
+            cSymbol *sym = GetName();
+            if (sym == nullptr || sym->GetDecl() == nullptr) return nullptr;
+            cDeclNode *decl = sym->GetDecl();
+            if (decl->IsFunc())
+            {
+                cFuncDeclNode *fd = static_cast<cFuncDeclNode*>(decl);
+                cSymbol *typeSym = fd->GetType();
+                if (typeSym == nullptr || typeSym->GetDecl() == nullptr)
+                    return nullptr;
+                return typeSym->GetDecl();
+            }
             return nullptr;
         }
 

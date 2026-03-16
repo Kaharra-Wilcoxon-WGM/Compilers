@@ -26,9 +26,20 @@ class cStructDeclNode : public cDeclNode
             cSymbol *localSym = g_symbolTable.FindLocal(name->GetName());
             if (localSym != nullptr)
             {
-                // Use local symbol and mark as type
-                localSym->SetIsType(true);
-                AddChild(localSym);
+                // Check for duplicate definition
+                if (localSym->GetDecl() != nullptr &&
+                    !localSym->GetDecl()->IsType())
+                {
+                    SemanticParseError("Symbol " + localSym->GetName() +
+                        " already defined in current scope");
+                    AddChild(localSym);
+                }
+                else
+                {
+                    localSym->SetIsType(true);
+                    AddChild(localSym);
+                    localSym->SetDecl(this);
+                }
             }
             else
             {
@@ -41,6 +52,7 @@ class cStructDeclNode : public cDeclNode
                     newSym->SetIsType(true);
                     g_symbolTable.Insert(newSym);
                     AddChild(newSym);
+                    newSym->SetDecl(this);
                 }
                 else
                 {
@@ -48,12 +60,16 @@ class cStructDeclNode : public cDeclNode
                     name->SetIsType(true);
                     g_symbolTable.Insert(name);
                     AddChild(name);
+                    name->SetDecl(this);
                 }
             }
         }
 
         cDeclsNode* GetDecls() { return static_cast<cDeclsNode*>(GetChild(0)); }
         cSymbol* GetName()     { return static_cast<cSymbol*>(GetChild(1)); }
+
+        virtual bool IsStruct() { return true; }
+        virtual bool IsType()   { return true; }
 
         virtual string NodeType() { return string("struct_decl"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }

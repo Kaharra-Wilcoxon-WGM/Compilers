@@ -1,0 +1,77 @@
+.dataseg
+.codeseg
+PUSH  5 
+PUSH  3 
+CALL @add
+SWAP
+POP
+SWAP
+POP
+CALL @print
+POP
+POP
+PUSH  7 
+PUSH  6 
+CALL @mul
+SWAP
+POP
+SWAP
+POP
+CALL @print
+POP
+POP
+PUSH  4 
+PUSH  3 
+CALL @mul
+SWAP
+POP
+SWAP
+POP
+PUSH  10 
+CALL @add
+SWAP
+POP
+SWAP
+POP
+CALL @print
+POP
+POP
+PUSH  4 
+PUSH  3 
+CALL @add
+SWAP
+POP
+SWAP
+POP
+PUSH  2 
+PUSH  1 
+CALL @add
+SWAP
+POP
+SWAP
+POP
+CALL @add
+SWAP
+POP
+SWAP
+POP
+CALL @print
+POP
+POP
+HALT
+.function add
+add:
+PUSHVAR  -12 
+PUSHVAR  -16 
+PLUS
+RETURNV
+PUSH 0
+RETURNV
+.function mul
+mul:
+PUSHVAR  -12 
+PUSHVAR  -16 
+TIMES
+RETURNV
+PUSH 0
+RETURNV

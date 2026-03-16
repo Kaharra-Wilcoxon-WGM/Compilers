@@ -1,0 +1,17 @@
+// Kaharra Wilcoxon
+// Test array references as both lvals and rvals
+program
+{
+    array int[5] intarr;
+    intarr vals;
+    vals[0] = 10;
+    vals[1] = 20;
+    vals[2] = 30;
+    vals[3] = vals[0] + vals[1];
+    vals[4] = vals[2] * 2;
+    print(vals[0]);
+    print(vals[1]);
+    print(vals[2]);
+    print(vals[3]);
+    print(vals[4]);
+}

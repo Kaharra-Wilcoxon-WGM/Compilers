@@ -1,0 +1,41 @@
+// Kaharra Wilcoxon
+// Test while loops including counting
+program
+{
+    int less_than(int a, int b)
+    {
+        int result;
+        if (a == b)
+            result = 0;
+        else
+        {
+            result = b - a;
+            if (result == 0)
+                result = 0;
+            endif;
+        }
+        endif;
+        return result;
+    }
+
+    int i;
+    int sum;
+
+    // Simple loop that runs once
+    i = 1;
+    while (i == 1)
+    {
+        print(i);
+        i = 0;
+    }
+
+    // Compute sum 1+2+3 using a loop with function condition
+    i = 0;
+    sum = 0;
+    while (less_than(i, 3))
+    {
+        i = i + 1;
+        sum = sum + i;
+    }
+    print(sum);
+}

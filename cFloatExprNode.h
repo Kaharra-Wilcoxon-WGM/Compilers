@@ -12,6 +12,7 @@
 
 #include "cAstNode.h"
 #include "cExprNode.h"
+#include "cSymbolTable.h"
 #include <cstdio>
 
 class cFloatExprNode : public cExprNode
@@ -21,6 +22,11 @@ class cFloatExprNode : public cExprNode
         cFloatExprNode(double value) : cExprNode()
         {
             m_value = value;
+        }
+
+        virtual cDeclNode* GetType()
+        {
+            return g_symbolTable.Find("float")->GetDecl();
         }
 
         virtual string AttributesToString()

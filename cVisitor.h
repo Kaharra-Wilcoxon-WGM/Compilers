@@ -32,6 +32,7 @@ class cStmtsNode;
 class cStructDeclNode;
 class cSymbol;
 class cVarDeclNode;
+class cBaseTypeNode;
 class cVarExprNode;
 class cWhileNode;
 
@@ -67,6 +68,7 @@ class cVisitor
         virtual void Visit(cStructDeclNode *node);
         virtual void Visit(cSymbol *node);
         virtual void Visit(cVarDeclNode *node);
+        virtual void Visit(cBaseTypeNode *node);
         virtual void Visit(cVarExprNode *node);
         virtual void Visit(cWhileNode *node);
 };

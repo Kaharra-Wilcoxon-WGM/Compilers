@@ -37,6 +37,8 @@
 #include "cParamListNode.h"
 #include "cFuncExprNode.h"
 #include "cArrayDeclNode.h"
+#include "cBaseTypeNode.h"
 #include "cPrintsNode.h"
 #include "cComputeSize.h"
+#include "cCodeGen.h"
 

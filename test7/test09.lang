@@ -1,0 +1,19 @@
+// Kaharra Wilcoxon
+// Test function return values used in expressions and assignments
+program
+{
+    int square(int n)
+    {
+        return n * n;
+    }
+
+    int x;
+    int y;
+    x = square(5);
+    y = square(3);
+    print(x);
+    print(y);
+    print(x + y);
+    x = square(square(2));
+    print(x);
+}

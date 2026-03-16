@@ -1,0 +1,11 @@
+// Kaharra Wilcoxon
+// Test equality operator and use in conditions
+program
+{
+    int x;
+    x = 5;
+    print(x == 5);
+    print(x == 3);
+    print(1 + 2 == 3);
+    print(2 * 3 == 7);
+}

@@ -25,8 +25,19 @@ class cVarDeclNode : public cDeclNode
             cSymbol *localSym = g_symbolTable.FindLocal(name->GetName());
             if (localSym != nullptr)
             {
-                // Name exists in local scope - use the local symbol
-                AddChild(localSym);
+                // Check for duplicate definition
+                if (localSym->GetDecl() != nullptr &&
+                    !localSym->GetDecl()->IsType())
+                {
+                    SemanticParseError("Symbol " + localSym->GetName() +
+                        " already defined in current scope");
+                    AddChild(localSym);
+                }
+                else
+                {
+                    AddChild(localSym);
+                    localSym->SetDecl(this);
+                }
             }
             else
             {
@@ -38,18 +49,22 @@ class cVarDeclNode : public cDeclNode
                     cSymbol *newSym = new cSymbol(name->GetName());
                     g_symbolTable.Insert(newSym);
                     AddChild(newSym);
+                    newSym->SetDecl(this);
                 }
                 else
                 {
                     // New name, insert it and use it
                     g_symbolTable.Insert(name);
                     AddChild(name);
+                    name->SetDecl(this);
                 }
             }
         }
 
         cSymbol* GetType()  { return static_cast<cSymbol*>(GetChild(0)); }
         cSymbol* GetName()  { return static_cast<cSymbol*>(GetChild(1)); }
+
+        virtual bool IsVar() { return true; }
 
         virtual string NodeType() { return string("var_decl"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }

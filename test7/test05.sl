@@ -1,0 +1,37 @@
+.dataseg
+.codeseg
+ADJSP  4 
+PUSH  5 
+PUSH  0 
+PUSHFP
+PLUS
+POPVARIND
+PUSHVAR  0 
+PUSH  5 
+EQ
+CALL @print
+POP
+POP
+PUSHVAR  0 
+PUSH  3 
+EQ
+CALL @print
+POP
+POP
+PUSH  1 
+PUSH  2 
+PLUS
+PUSH  3 
+EQ
+CALL @print
+POP
+POP
+PUSH  2 
+PUSH  3 
+TIMES
+PUSH  7 
+EQ
+CALL @print
+POP
+POP
+HALT
